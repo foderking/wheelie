@@ -1,5 +1,5 @@
-#ifndef MPU6050
-#define MPU6050
+#ifndef MPU_6050
+#define MPU_6050
 #endif
 
 #include "Arduino.h"
