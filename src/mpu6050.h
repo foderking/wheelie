@@ -8,7 +8,10 @@
 
 typedef enum
 {
-
+    ACCEL_XOUT_H = 0x3B,
+    ACCEL_XOUT_L = 0x3C,
+    PWR_MGMT_1 = 0x6B,
+    WHO_AM_I = 0x75
 } RegisterAddress;
 
 class MPU6050
