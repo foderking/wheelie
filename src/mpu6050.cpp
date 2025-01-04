@@ -1,7 +1,22 @@
 #include "Wire.h"
+#include "Arduino.h"
 #include "mpu6050.h"
 
-uint8_t MPU6050::readRegister(RegisterAddress reg){
+void MPU6050::init(){
+    writeRegister(PWR_MGMT_1, 0x0);
+    gyro_scale_factor = 131.0;
+    accel_scale_factor = 16384.0;
+    temp_scale_factor = 340.0;
+}
+
+bool MPU6050::status(){
+    uint8_t status = readRegister(WHO_AM_I);
+    Serial.print("WHO_AM_I: 0x");
+    Serial.println(status, HEX);
+    return status == 0x68;
+}
+
+uint8_t MPU6050::readRegister(MPURegister reg){
     uint8_t value;
 
     Wire.beginTransmission(MPU6050_ADDRESS);
@@ -17,10 +32,33 @@ uint8_t MPU6050::readRegister(RegisterAddress reg){
     return value;
 }
 
-void MPU6050::writeRegister(RegisterAddress reg, uint8_t value){
+void MPU6050::writeRegister(MPURegister reg, uint8_t value){
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(reg);
     Wire.write(value);
     Wire.endTransmission();
     return;
+}
+
+void MPU6050::update(){
+    Wire.beginTransmission(MPU6050_ADDRESS);
+    Wire.write(ACCEL_XOUT_H);
+    Wire.endTransmission(false);
+    Wire.requestFrom(MPU6050_ADDRESS, 14);
+
+    int16_t accelX = (Wire.read() << 8) | Wire.read();
+    int16_t accelY = (Wire.read() << 8) | Wire.read();
+    int16_t accelZ = (Wire.read() << 8) | Wire.read();
+    int16_t tmp    = (Wire.read() << 8) | Wire.read();
+    int16_t gyroX  = (Wire.read() << 8) | Wire.read();
+    int16_t gyroY  = (Wire.read() << 8) | Wire.read();
+    int16_t gyroZ  = (Wire.read() << 8) | Wire.read();
+
+    accel_x = (float)accelX / accel_scale_factor;
+    accel_y = (float)accelY / accel_scale_factor;
+    accel_z = (float)accelZ / accel_scale_factor;
+    gyro_x = (float)gyroX / gyro_scale_factor;
+    gyro_y = (float)gyroY / gyro_scale_factor;
+    gyro_z = (float)gyroZ / gyro_scale_factor;
+    temp = (float)tmp / temp_scale_factor;
 }
