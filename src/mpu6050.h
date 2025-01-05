@@ -42,14 +42,17 @@ typedef enum
 
 typedef enum
 {
-    MPU6050_CLOCK_KEEP_RESET      = 0b111,
-    MPU6050_CLOCK_EXTERNAL_19MHZ  = 0b101,
-    MPU6050_CLOCK_EXTERNAL_32KHZ  = 0b100,
-    MPU6050_CLOCK_PLL_ZGYRO       = 0b011,
-    MPU6050_CLOCK_PLL_YGYRO       = 0b010,
-    MPU6050_CLOCK_PLL_XGYRO       = 0b001,
-    MPU6050_CLOCK_INTERNAL_8MHZ   = 0b000
+    INTERNAL_8MHZ   = 0,
+    PLL_XGYRO       = 1,
+    PLL_YGYRO       = 2,
+    PLL_ZGYRO       = 3,
+    EXTERNAL_32KHZ  = 4,
+    EXTERNAL_19MHZ  = 5,
+    KEEP_RESET      = 7
 } MPUClockSource;
+
+#define MASK_CLOCK_SOURCE (0b11111000)
+#define POS_CLOCK_SOURCE  (0)
 
 
 class MPU6050
@@ -63,8 +66,12 @@ class MPU6050
     float gyro_x, gyro_y, gyro_z, temp;
     void init();
     bool status();
+    void setClockSource(MPUClockSource source);
+    MPUClockSource getClockSource();
     uint8_t readRegister(MPURegister register);
+    uint8_t readRegister(MPURegister register, uint8_t mask, uint8_t pos);
     void writeRegister(MPURegister register, uint8_t value);
+    void writeRegister(MPURegister register, uint8_t value, uint8_t mask, uint8_t pos);
     void update();
 };
 

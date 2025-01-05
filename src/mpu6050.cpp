@@ -16,6 +16,14 @@ bool MPU6050::status(){
     return status == 0x68;
 }
 
+void MPU6050::setClockSource(MPUClockSource source){
+    writeRegister(PWR_MGMT_1, source, MASK_CLOCK_SOURCE, POS_CLOCK_SOURCE);
+}
+
+MPUClockSource MPU6050::getClockSource(){
+    return (MPUClockSource) readRegister(PWR_MGMT_1, MASK_CLOCK_SOURCE, POS_CLOCK_SOURCE);
+}
+
 uint8_t MPU6050::readRegister(MPURegister reg){
     uint8_t value;
 
@@ -32,12 +40,24 @@ uint8_t MPU6050::readRegister(MPURegister reg){
     return value;
 }
 
+uint8_t MPU6050::readRegister(MPURegister reg, uint8_t mask, uint8_t pos){
+    uint8_t tmp = readRegister(reg) & ~mask;
+    return tmp >> pos;
+}
+
 void MPU6050::writeRegister(MPURegister reg, uint8_t value){
     Wire.beginTransmission(MPU6050_ADDRESS);
     Wire.write(reg);
     Wire.write(value);
     Wire.endTransmission();
     return;
+}
+
+void MPU6050::writeRegister(MPURegister reg, uint8_t value, uint8_t mask, uint8_t pos){
+    uint8_t tmp = readRegister(reg);
+    tmp &= mask;
+    tmp |= value << pos;
+    writeRegister(reg, tmp);
 }
 
 void MPU6050::update(){
