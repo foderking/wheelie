@@ -51,10 +51,30 @@ typedef enum
     KEEP_RESET      = 7
 } MPUClockSource;
 
+typedef enum
+{
+    FS_SEL_250  = 0,
+    FS_SEL_500  = 1,
+    FS_SEL_1000 = 2,
+    FS_SEL_2000 = 3
+} MPUGyroRange;
+
+typedef enum
+{
+    AFS_SEL_2g  = 0,
+    AFS_SEL_4g  = 1,
+    AFS_SEL_8g  = 2,
+    AFS_SEL_16g = 3,
+} MPUAccelRange;
+
 #define MASK_CLKSEL   (0b11111000)
 #define POS_CLKSEL    (0)
 #define MASK_TEMP_DIS (0b11110111)
 #define POS_TEMP_DIS  (3)
+#define MASK_FS_SEL   (0b11100111)
+#define POS_FS_SEL    (3)
+#define MASK_AFS_SEL  (0b11100111)
+#define POS_AFS_SEL   (3)
 
 
 class MPU6050
@@ -74,6 +94,10 @@ class MPU6050
     MPUClockSource getClockSource();
     void setTemperatureSensorStatus(bool enable);
     bool getTemperatureSensorStatus();
+    void setAccelRange(MPUAccelRange range);
+    MPUAccelRange getAccelRange();
+    void setGyroRange(MPUGyroRange range);
+    MPUGyroRange getGyroRange();
 
     uint8_t readRegister(MPURegister register);
     uint8_t readRegister(MPURegister register, uint8_t mask, uint8_t pos);

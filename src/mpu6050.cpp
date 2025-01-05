@@ -3,7 +3,7 @@
 #include "mpu6050.h"
 
 void MPU6050::init(){
-    writeRegister(PWR_MGMT_1, 0x0);
+    writeRegister(PWR_MGMT_1, 0x0); // sets default config
     setClockSource(PLL_XGYRO); // people say this is better than the internal one.. idk
     gyro_scale_factor = 131.0;
     accel_scale_factor = 16384.0;
@@ -37,6 +37,56 @@ void MPU6050::setTemperatureSensorStatus(bool enable) {
  */
 bool MPU6050::getTemperatureSensorStatus() {
     return !readRegister(PWR_MGMT_1, MASK_TEMP_DIS, POS_TEMP_DIS);
+}
+
+void MPU6050::setAccelRange(MPUAccelRange range){
+    writeRegister(ACCEL_CONFIG, range, MASK_AFS_SEL, POS_AFS_SEL);
+    switch (range)
+    {
+        case AFS_SEL_2g:
+            accel_scale_factor = 16384.0;
+            break;
+        case AFS_SEL_4g:
+            accel_scale_factor = 8192.0;
+            break;
+        case AFS_SEL_8g:
+            accel_scale_factor = 4096.0;
+            break;
+        case AFS_SEL_16g:
+            accel_scale_factor = 2048.0;
+            break;
+        default:
+            break;
+    }
+}
+
+MPUAccelRange MPU6050::getAccelRange(){
+    return (MPUAccelRange) readRegister(ACCEL_CONFIG, MASK_AFS_SEL, POS_AFS_SEL);
+}
+
+void MPU6050::setGyroRange(MPUGyroRange range){
+    writeRegister(GYRO_CONFIG, range, MASK_FS_SEL, POS_FS_SEL);
+    switch (range)
+    {
+        case FS_SEL_250:
+            gyro_scale_factor = 131.0;
+            break;
+        case FS_SEL_500:
+            gyro_scale_factor = 65.5;
+            break;
+        case FS_SEL_1000:
+            gyro_scale_factor = 32.8;
+            break;
+        case FS_SEL_2000:
+            gyro_scale_factor = 16.4;
+            break;
+        default:
+            break;
+    }
+}
+
+MPUGyroRange MPU6050::getGyroRange() {
+    return (MPUGyroRange) readRegister(GYRO_CONFIG, MASK_FS_SEL, POS_FS_SEL);
 }
 
 uint8_t MPU6050::readRegister(MPURegister reg){
