@@ -87,6 +87,7 @@ class MPU6050
     float accel_x, accel_y, accel_z;
     float gyro_x, gyro_y, gyro_z, temp;
 
+    MPU6050();
     void init();
     bool status();
 
