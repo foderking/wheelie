@@ -4,6 +4,16 @@
 #include "Wire.h"
 
 #define MPU6050_ADDRESS (0x68)
+#define MASK_CLKSEL   (0b11111000)
+#define POS_CLKSEL    (0)
+#define MASK_TEMP_DIS (0b11110111)
+#define POS_TEMP_DIS  (3)
+#define MASK_FS_SEL   (0b11100111)
+#define POS_FS_SEL    (3)
+#define MASK_AFS_SEL  (0b11100111)
+#define POS_AFS_SEL   (3)
+#define MASK_DLPF_CFG (0b11111000)
+#define POS_DLPF_CFG  (0)
 
 typedef enum
 {
@@ -67,14 +77,16 @@ typedef enum
     AFS_SEL_16g = 3,
 } MPUAccelRange;
 
-#define MASK_CLKSEL   (0b11111000)
-#define POS_CLKSEL    (0)
-#define MASK_TEMP_DIS (0b11110111)
-#define POS_TEMP_DIS  (3)
-#define MASK_FS_SEL   (0b11100111)
-#define POS_FS_SEL    (3)
-#define MASK_AFS_SEL  (0b11100111)
-#define POS_AFS_SEL   (3)
+typedef enum
+{
+    DLPF_ACCEL260Hz_GYRO256Hz = 0,
+    DLPF_ACCEL184Hz_GYRO188Hz = 1,
+    DLPF_ACCEL94Hz_GYRO98Hz   = 2,
+    DLPF_ACCEL44Hz_GYRO42Hz   = 3,
+    DLPF_ACCEL21Hz_GYRO20Hz   = 4,
+    DLPF_ACCEL10Hz_GYRO10Hz   = 5,
+    DLPF_ACCEL5Hz_GYRO5Hz     = 6
+} MPULowPassFilter;
 
 
 class MPU6050
@@ -99,6 +111,8 @@ class MPU6050
     MPUAccelRange getAccelRange();
     void setGyroRange(MPUGyroRange range);
     MPUGyroRange getGyroRange();
+    void setLowPassFilter(MPULowPassFilter filter);
+    MPULowPassFilter getLowPassFilter();
 
     uint8_t readRegister(MPURegister register);
     uint8_t readRegister(MPURegister register, uint8_t mask, uint8_t pos);

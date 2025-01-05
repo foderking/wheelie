@@ -92,6 +92,14 @@ MPUGyroRange MPU6050::getGyroRange() {
     return (MPUGyroRange) readRegister(GYRO_CONFIG, MASK_FS_SEL, POS_FS_SEL);
 }
 
+void MPU6050::setLowPassFilter(MPULowPassFilter filter){
+    writeRegister(CONFIG, filter, MASK_DLPF_CFG, POS_DLPF_CFG);
+}
+
+MPULowPassFilter MPU6050::getLowPassFilter(){
+    return (MPULowPassFilter) readRegister(CONFIG, MASK_DLPF_CFG, POS_DLPF_CFG);
+}
+
 uint8_t MPU6050::readRegister(MPURegister reg){
     uint8_t value;
 
