@@ -4,6 +4,7 @@
 
 void MPU6050::init(){
     writeRegister(PWR_MGMT_1, 0x0);
+    setClockSource(PLL_XGYRO); // people say this is better than the internal one.. idk
     gyro_scale_factor = 131.0;
     accel_scale_factor = 16384.0;
     temp_scale_factor = 340.0;
@@ -17,11 +18,25 @@ bool MPU6050::status(){
 }
 
 void MPU6050::setClockSource(MPUClockSource source){
-    writeRegister(PWR_MGMT_1, source, MASK_CLOCK_SOURCE, POS_CLOCK_SOURCE);
+    writeRegister(PWR_MGMT_1, source, MASK_CLKSEL, POS_CLKSEL);
 }
 
 MPUClockSource MPU6050::getClockSource(){
-    return (MPUClockSource) readRegister(PWR_MGMT_1, MASK_CLOCK_SOURCE, POS_CLOCK_SOURCE);
+    return (MPUClockSource) readRegister(PWR_MGMT_1, MASK_CLKSEL, POS_CLKSEL);
+}
+
+/**
+ * if `enable` is true, enables the sensor. otherwise disables it
+ */
+void MPU6050::setTemperatureSensorStatus(bool enable) {
+    writeRegister(PWR_MGMT_1, !enable, MASK_TEMP_DIS, POS_TEMP_DIS);
+}
+
+/**
+ * returns true if the sensor is enabled, false otherwise
+ */
+bool MPU6050::getTemperatureSensorStatus() {
+    return !readRegister(PWR_MGMT_1, MASK_TEMP_DIS, POS_TEMP_DIS);
 }
 
 uint8_t MPU6050::readRegister(MPURegister reg){

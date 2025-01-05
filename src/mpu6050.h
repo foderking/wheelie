@@ -51,8 +51,10 @@ typedef enum
     KEEP_RESET      = 7
 } MPUClockSource;
 
-#define MASK_CLOCK_SOURCE (0b11111000)
-#define POS_CLOCK_SOURCE  (0)
+#define MASK_CLKSEL   (0b11111000)
+#define POS_CLKSEL    (0)
+#define MASK_TEMP_DIS (0b11110111)
+#define POS_TEMP_DIS  (3)
 
 
 class MPU6050
@@ -64,14 +66,20 @@ class MPU6050
     public:
     float accel_x, accel_y, accel_z;
     float gyro_x, gyro_y, gyro_z, temp;
+
     void init();
     bool status();
+
     void setClockSource(MPUClockSource source);
     MPUClockSource getClockSource();
+    void setTemperatureSensorStatus(bool enable);
+    bool getTemperatureSensorStatus();
+
     uint8_t readRegister(MPURegister register);
     uint8_t readRegister(MPURegister register, uint8_t mask, uint8_t pos);
     void writeRegister(MPURegister register, uint8_t value);
     void writeRegister(MPURegister register, uint8_t value, uint8_t mask, uint8_t pos);
+
     void update();
 };
 
