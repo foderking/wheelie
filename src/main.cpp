@@ -7,8 +7,7 @@ MPU6050 mpu;
 void setup() {
     Serial.begin(9600);
     Wire.begin();
-    mpu.init(FS_SEL_250, AFS_SEL_2g);
-    //mpu.setLowPassFilter(DLPF_ACCEL184Hz_GYRO188Hz);
+    mpu.init(FS_SEL_250, AFS_SEL_2g, DLPF_ACCEL184Hz_GYRO188Hz);
 }
 
 void loop() {
@@ -26,7 +25,5 @@ void loop() {
     // Serial.print("/");
     // Serial.println(mpu.gyro_z);
 
-    //Serial.println();
- 
     delay(1000);
 }

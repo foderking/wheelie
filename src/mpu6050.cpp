@@ -6,11 +6,12 @@ MPU6050::MPU6050()
 : gyro_scale_factor(131.0), accel_scale_factor(16384.0), temp_scale_factor(340.0)
 {}
 
-void MPU6050::init(MPUGyroRange gyro_range, MPUAccelRange accel_range){
+void MPU6050::init(MPUGyroRange gyro_range, MPUAccelRange accel_range, MPULowPassFilter filter){
     writeRegister(PWR_MGMT_1, 0x0); // sets default config
     setClockSource(PLL_XGYRO); // people say this is better than the internal one.. idk
     setAccelRange(accel_range);
     setGyroRange(gyro_range);
+    setLowPassFilter(filter);
 }
 
 bool MPU6050::status(){

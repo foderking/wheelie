@@ -100,7 +100,7 @@ class MPU6050
     float gyro_x, gyro_y, gyro_z, temp;
 
     MPU6050();
-    void init(MPUGyroRange gyro_range, MPUAccelRange accel_range);
+    void init(MPUGyroRange gyro_range, MPUAccelRange accel_range, MPULowPassFilter filter);
     bool status();
 
     void setClockSource(MPUClockSource source);
