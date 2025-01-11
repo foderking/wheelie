@@ -1,13 +1,14 @@
 #include <Wire.h>
 #include <Arduino.h>
-#include "mpu6050.h"
+#include "imu.h"
 
-MPU6050 mpu;
+MPU_6050 mpu;
 
 void setup() {
     Serial.begin(9600);
     Wire.begin();
-    mpu.init(FS_SEL_250, AFS_SEL_2g, DLPF_ACCEL184Hz_GYRO188Hz);
+    mpu.init();
+    //mpu.setDLPFMode(1);
 }
 
 void loop() {
@@ -19,11 +20,13 @@ void loop() {
     Serial.print("/");
     Serial.println(mpu.accel_z);
 
-    // Serial.print(mpu.gyro_x);
-    // Serial.print("/");
-    // Serial.print(mpu.gyro_y);
-    // Serial.print("/");
-    // Serial.println(mpu.gyro_z);
+    Serial.print(mpu.gyro_x);
+    Serial.print("/");
+    Serial.print(mpu.gyro_y);
+    Serial.print("/");
+    Serial.println(mpu.gyro_z);
+
+    Serial.println();
 
     delay(1000);
 }
