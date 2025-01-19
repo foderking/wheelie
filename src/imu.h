@@ -2,9 +2,9 @@
 #ifndef IMU_DEF
 #define IMU_DEF
 
-#include "MPU6050.h"
+#include "MPU6050_6Axis_MotionApps20.h"
 
-class MPU_6050 : public MPU6050_Base {
+class MPU_6050 : public MPU6050_6Axis_MotionApps20 {
     public:
     float accel_x, accel_y, accel_z;
     float gyro_x, gyro_y, gyro_z, temp;
