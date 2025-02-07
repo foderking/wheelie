@@ -48,6 +48,7 @@ THE SOFTWARE.
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 
+#include "motor.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 //#include "MPU6050.h" // not necessary if using MotionApps include file
 
@@ -123,8 +124,15 @@ MPU6050 mpu;
 
 #define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
+#define ENA 9
+#define ENB 3
+#define IN1 8
+#define IN2 7
+#define IN3 5
+#define IN4 4
 bool blinkState = false;
 
+uint8_t speed = 0;
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
 uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
@@ -146,6 +154,7 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 // packet structure for InvenSense teapot demo
 uint8_t teapotPacket[14] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0x00, '\r', '\n' };
 
+Motor motor(IN1,IN2,IN3,IN4,ENA,ENB);
 
 
 // ================================================================
@@ -275,7 +284,7 @@ void loop() {
             // display Euler angles in degrees
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetEuler(euler, &q);
-            Serial.print("euler\t");
+            Serial.Rightprint("euler\t");
             Serial.print(euler[0] * 180/M_PI);
             Serial.print("\t");
             Serial.print(euler[1] * 180/M_PI);
@@ -295,6 +304,10 @@ void loop() {
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print("\t");
             Serial.println(ypr[2] * 180/M_PI);
+            speed = min(abs(ypr[2]), 50)/50*255;
+            MotorDirection dir = ypr[2] > 0 ? Foward : Backward;
+            motor.turnMotor(Left, dir, speed);
+            motor.turnMotor(Right, dir, speed);
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
