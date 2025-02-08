@@ -48,7 +48,6 @@ THE SOFTWARE.
 // for both classes must be in the include path of your project
 #include "I2Cdev.h"
 
-#include "motor.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 //#include "MPU6050.h" // not necessary if using MotionApps include file
 
@@ -108,7 +107,7 @@ MPU6050 mpu;
 // not compensated for orientation, so +X is always +X according to the
 // sensor, just without the effects of gravity. If you want acceleration
 // compensated for orientation, us OUTPUT_READABLE_WORLDACCEL instead.
-#define OUTPUT_READABLE_REALACCEL
+//#define OUTPUT_READABLE_REALACCEL
 
 // uncomment "OUTPUT_READABLE_WORLDACCEL" if you want to see acceleration
 // components with gravity removed and adjusted for the world frame of
@@ -122,17 +121,10 @@ MPU6050 mpu;
 
 
 
-#define INTERRUPT_PIN 2  // use pin 2 on Arduino Uno & most boards
+#define INTERRUPT_PIN 4  // use pin 2 on Arduino Uno & most boards
 #define LED_PIN 13 // (Arduino is 13, Teensy is 11, Teensy++ is 6)
-#define ENA 9
-#define ENB 3
-#define IN1 8
-#define IN2 7
-#define IN3 5
-#define IN4 4
 bool blinkState = false;
 
-uint8_t speed = 0;
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
 uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
@@ -144,7 +136,6 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 // orientation/motion vars
 Quaternion q;           // [w, x, y, z]         quaternion container
 VectorInt16 aa;         // [x, y, z]            accel sensor measurements
-VectorInt16 gyro;         // [x, y, z]            accel sensor measurements
 VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
 VectorInt16 aaWorld;    // [x, y, z]            world-frame accel sensor measurements
 VectorFloat gravity;    // [x, y, z]            gravity vector
@@ -154,7 +145,6 @@ float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gra
 // packet structure for InvenSense teapot demo
 uint8_t teapotPacket[14] = { '$', 0x02, 0,0, 0,0, 0,0, 0,0, 0x00, 0x00, '\r', '\n' };
 
-Motor motor(IN1,IN2,IN3,IN4,ENA,ENB);
 
 
 // ================================================================
@@ -162,7 +152,7 @@ Motor motor(IN1,IN2,IN3,IN4,ENA,ENB);
 // ================================================================
 
 volatile bool mpuInterrupt = false;     // indicates whether MPU interrupt pin has gone high
-void dmpDataReady() {
+void IRAM_ATTR dmpDataReady() {
     mpuInterrupt = true;
 }
 
@@ -185,8 +175,8 @@ void setup() {
     // initialize serial communication
     // (115200 chosen because it is required for Teapot Demo output, but it's
     // really up to you depending on your project)
-    Serial.begin(9600);
-    while (!Serial);   // wait for Leonardo enumeration, others continue immediately
+    Serial.begin(115200);
+    while (!Serial); // wait for Leonardo enumeration, others continue immediately
 
     // NOTE: 8MHz or slower host processors, like the Teensy @ 3.3V or Arduino
     // Pro Mini running at 3.3V, cannot handle this baud rate reliably due to
@@ -253,7 +243,7 @@ void setup() {
     }
 
     // configure LED for output
-    pinMode(LED_PIN, OUTPUT);
+    //pinMode(LED_PIN, OUTPUT);
 }
 
 
@@ -284,14 +274,13 @@ void loop() {
             // display Euler angles in degrees
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetEuler(euler, &q);
-            Serial.Rightprint("euler\t");
+            Serial.print("euler\t");
             Serial.print(euler[0] * 180/M_PI);
             Serial.print("\t");
             Serial.print(euler[1] * 180/M_PI);
             Serial.print("\t");
             Serial.println(euler[2] * 180/M_PI);
         #endif
-
 
         #ifdef OUTPUT_READABLE_YAWPITCHROLL
             // display Euler angles in degrees
@@ -304,17 +293,12 @@ void loop() {
             Serial.print(ypr[1] * 180/M_PI);
             Serial.print("\t");
             Serial.println(ypr[2] * 180/M_PI);
-            speed = min(abs(ypr[2]), 50)/50*255;
-            MotorDirection dir = ypr[2] > 0 ? Foward : Backward;
-            motor.turnMotor(Left, dir, speed);
-            motor.turnMotor(Right, dir, speed);
         #endif
 
         #ifdef OUTPUT_READABLE_REALACCEL
             // display real acceleration, adjusted to remove gravity
             mpu.dmpGetQuaternion(&q, fifoBuffer);
             mpu.dmpGetAccel(&aa, fifoBuffer);
-            mpu.dmpGetGyro(&gyro, fifoBuffer);
             mpu.dmpGetGravity(&gravity, &q);
             mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
             Serial.print("areal\t");
@@ -323,17 +307,6 @@ void loop() {
             Serial.print(aaReal.y);
             Serial.print("\t");
             Serial.println(aaReal.z);
-
-            Serial.print("gyro\t");
-            Serial.print(gyro.x);
-            Serial.print("\t");
-            Serial.print(gyro.y);
-            Serial.print("\t");
-            Serial.println(gyro.z);
-
-            Serial.print("fifo\t");
-            uint16_t c = mpu.getFIFOCount();
-            Serial.println(c);
         #endif
 
         #ifdef OUTPUT_READABLE_WORLDACCEL
