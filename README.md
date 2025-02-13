@@ -9,4 +9,4 @@ A two-wheeled self-balancing robot.
 
 ## CAD
 
-![cad drawing]( /assets/assembly%20v11.png)
+![cad drawing]( /assets/assembly%20v11-1.png)
